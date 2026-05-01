@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Contagem Regressiva</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .container {
+      text-align: center;
+      z-index: 1;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    p {
+      margin-bottom: 20px;
+      font-size: 1.2rem;
+      color: #cbd5f5;
+    }
+
+    #contador {
+      font-size: 2rem;
+      background: rgba(255,255,255,0.1);
+      padding: 25px;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+    }
+
+    /* Confete */
+    .confete {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: red;
+      top: -10px;
+      animation: cair linear infinite;
+    }
+
+    @keyframes cair {
+      to {
+        transform: translateY(100vh) rotate(720deg);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <h1>Está chegando o grande momento 🎉</h1>
+    <p>Contagem regressiva até amanhã às 16:00</p>
+
+    <div id="contador">
+      0 dias, 0 horas, 0 minutos e 0 segundos
+    </div>
+  </div>
+
+  <script>
+    function getTargetDate() {
+      const agora = new Date();
+
+      const alvo = new Date();
+      alvo.setDate(agora.getDate() + 1);
+      alvo.setHours(16, 0, 0, 0);
+
+      return alvo;
+    }
+
+    const dataAlvo = getTargetDate();
+
+    function atualizarContador() {
+      const agora = new Date();
+      const diferenca = dataAlvo - agora;
+
+      if (diferenca <= 0) {
+        document.getElementById("contador").innerHTML = "🎊 Chegou o grande momento!";
+        return;
+      }
+
+      const dias = Math.floor(diferenca / (1000 * 60 * 60 * 24));
+      const horas = Math.floor((diferenca / (1000 * 60 * 60)) % 24);
+      const minutos = Math.floor((diferenca / (1000 * 60)) % 60);
+      const segundos = Math.floor((diferenca / 1000) % 60);
+
+      document.getElementById("contador").innerHTML =
+        `${dias} dias, ${horas} horas, ${minutos} minutos e ${segundos} segundos`;
+    }
+
+    setInterval(atualizarContador, 1000);
+    atualizarContador();
+
+    // Criar confetes
+    function criarConfete() {
+      const confete = document.createElement("div");
+      confete.classList.add("confete");
+
+      confete.style.left = Math.random() * 100 + "vw";
+      confete.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+      confete.style.animationDuration = (Math.random() * 3 + 2) + "s";
+
+      document.body.appendChild(confete);
+
+      setTimeout(() => {
+        confete.remove();
+      }, 5000);
+    }
+
+    setInterval(criarConfete, 200);
+  </script>
+
+</body>
+</html>
