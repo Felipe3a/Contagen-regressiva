@@ -19,45 +19,55 @@
 
     .container {
       text-align: center;
-      z-index: 1;
-      padding: 20px;
     }
 
     h1 {
-      font-size: 2.2rem;
       margin-bottom: 10px;
     }
 
-    p {
-      margin-bottom: 30px;
-      font-size: 1.2rem;
-      color: #cbd5f5;
-    }
-
-    /* 🔥 NOVO ESTILO DO CONTADOR */
     #contador {
       display: flex;
       gap: 15px;
       justify-content: center;
-      flex-wrap: wrap;
     }
 
     .box {
-      background: rgba(255,255,255,0.1);
-      padding: 20px 25px;
-      border-radius: 15px;
-      min-width: 100px;
-      backdrop-filter: blur(10px);
+      text-align: center;
     }
 
-    .numero {
-      font-size: 3rem;
+    .odometro {
+      overflow: hidden;
+      height: 50px;
+      width: 40px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.1);
+      display: inline-block;
+      margin: 2px;
+    }
+
+    .numeros {
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.5s ease-in-out;
+    }
+
+    .numeros div {
+      height: 50px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2rem;
       font-weight: bold;
     }
 
     .label {
-      font-size: 1rem;
+      margin-top: 5px;
+      font-size: 0.9rem;
       color: #cbd5f5;
+    }
+
+    .grupo {
+      display: flex;
     }
 
     /* Confete */
@@ -74,96 +84,128 @@
         transform: translateY(100vh) rotate(720deg);
       }
     }
-
-    /* Responsivo */
-    @media (max-width: 500px) {
-      .numero {
-        font-size: 2.2rem;
-      }
-      .box {
-        min-width: 80px;
-        padding: 15px;
-      }
-    }
-
   </style>
 </head>
 
 <body>
 
-  <div class="container">
-    <h1>Está chegando o grande momento 🎉</h1>
-    <p>Contagem regressiva até amanhã às 16:00</p>
+<div class="container">
+  <h1>Está chegando o grande momento 🎉</h1>
 
-    <div id="contador">
-      <div class="box">
-        <div class="numero" id="dias">0</div>
-        <div class="label">dias</div>
-      </div>
-      <div class="box">
-        <div class="numero" id="horas">0</div>
-        <div class="label">horas</div>
-      </div>
-      <div class="box">
-        <div class="numero" id="minutos">0</div>
-        <div class="label">minutos</div>
-      </div>
-      <div class="box">
-        <div class="numero" id="segundos">0</div>
-        <div class="label">segundos</div>
-      </div>
+  <div id="contador">
+    <div class="box">
+      <div class="grupo" id="dias"></div>
+      <div class="label">dias</div>
+    </div>
+
+    <div class="box">
+      <div class="grupo" id="horas"></div>
+      <div class="label">horas</div>
+    </div>
+
+    <div class="box">
+      <div class="grupo" id="minutos"></div>
+      <div class="label">minutos</div>
+    </div>
+
+    <div class="box">
+      <div class="grupo" id="segundos"></div>
+      <div class="label">segundos</div>
     </div>
   </div>
+</div>
 
-  <script>
-    function getTargetDate() {
-      const agora = new Date();
-      const alvo = new Date();
-      alvo.setDate(agora.getDate() + 1);
-      alvo.setHours(16, 0, 0, 0);
-      return alvo;
-    }
+<script>
+function criarDigito() {
+  const container = document.createElement("div");
+  container.classList.add("odometro");
 
-    const dataAlvo = getTargetDate();
+  const numeros = document.createElement("div");
+  numeros.classList.add("numeros");
 
-    function atualizarContador() {
-      const agora = new Date();
-      const diferenca = dataAlvo - agora;
+  for (let i = 0; i < 10; i++) {
+    const num = document.createElement("div");
+    num.textContent = i;
+    numeros.appendChild(num);
+  }
 
-      if (diferenca <= 0) {
-        document.getElementById("contador").innerHTML = "🎊 Chegou o grande momento!";
-        return;
-      }
+  container.appendChild(numeros);
+  return { container, numeros };
+}
 
-      const dias = Math.floor(diferenca / (1000 * 60 * 60 * 24));
-      const horas = Math.floor((diferenca / (1000 * 60 * 60)) % 24);
-      const minutos = Math.floor((diferenca / (1000 * 60)) % 60);
-      const segundos = Math.floor((diferenca / 1000) % 60);
+function criarGrupo(id, quantidade) {
+  const grupo = document.getElementById(id);
+  const digitos = [];
 
-      document.getElementById("dias").textContent = dias;
-      document.getElementById("horas").textContent = horas;
-      document.getElementById("minutos").textContent = minutos;
-      document.getElementById("segundos").textContent = segundos;
-    }
+  for (let i = 0; i < quantidade; i++) {
+    const digito = criarDigito();
+    grupo.appendChild(digito.container);
+    digitos.push(digito.numeros);
+  }
 
-    setInterval(atualizarContador, 1000);
-    atualizarContador();
+  return digitos;
+}
 
-    function criarConfete() {
-      const confete = document.createElement("div");
-      confete.classList.add("confete");
+const diasDigitos = criarGrupo("dias", 2);
+const horasDigitos = criarGrupo("horas", 2);
+const minutosDigitos = criarGrupo("minutos", 2);
+const segundosDigitos = criarGrupo("segundos", 2);
 
-      confete.style.left = Math.random() * 100 + "vw";
-      confete.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
-      confete.style.animationDuration = (Math.random() * 3 + 2) + "s";
+function atualizarDigitos(valor, digitos) {
+  const str = valor.toString().padStart(digitos.length, "0");
 
-      document.body.appendChild(confete);
+  str.split("").forEach((num, i) => {
+    const offset = num * 50;
+    digitos[i].style.transform = `translateY(-${offset}px)`;
+  });
+}
 
-      setTimeout(() => confete.remove(), 5000);
-    }
+function getTargetDate() {
+  const agora = new Date();
+  const alvo = new Date();
+  alvo.setDate(agora.getDate() + 1);
+  alvo.setHours(16, 0, 0, 0);
+  return alvo;
+}
 
-    setInterval(criarConfete, 200);
-  </script>
+const dataAlvo = getTargetDate();
+
+function atualizar() {
+  const agora = new Date();
+  const diff = dataAlvo - agora;
+
+  if (diff <= 0) {
+    document.body.innerHTML = "<h1>🎊 Chegou o grande momento!</h1>";
+    return;
+  }
+
+  const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const horas = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const minutos = Math.floor((diff / (1000 * 60)) % 60);
+  const segundos = Math.floor((diff / 1000) % 60);
+
+  atualizarDigitos(dias, diasDigitos);
+  atualizarDigitos(horas, horasDigitos);
+  atualizarDigitos(minutos, minutosDigitos);
+  atualizarDigitos(segundos, segundosDigitos);
+}
+
+setInterval(atualizar, 1000);
+atualizar();
+
+// confete
+function criarConfete() {
+  const c = document.createElement("div");
+  c.classList.add("confete");
+  c.style.left = Math.random() * 100 + "vw";
+  c.style.backgroundColor = `hsl(${Math.random()*360},100%,50%)`;
+  c.style.animationDuration = (Math.random()*3+2)+"s";
+  document.body.appendChild(c);
+  setTimeout(() => c.remove(), 5000);
+}
+
+setInterval(criarConfete, 200);
+</script>
 
 </body>
 </html>
