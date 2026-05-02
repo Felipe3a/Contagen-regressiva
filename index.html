@@ -2,46 +2,63 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Contagem Regressiva</title>
 
   <style>
-    body {
+    * {
+      box-sizing: border-box;
       margin: 0;
+      padding: 0;
+    }
+
+    body {
       font-family: Arial, sans-serif;
       background: linear-gradient(135deg, #0f172a, #1e293b);
       color: #fff;
+      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      overflow: hidden;
+      text-align: center;
+      padding: 20px;
     }
 
     .container {
-      text-align: center;
+      width: 100%;
+      max-width: 900px;
     }
 
     h1 {
-      margin-bottom: 10px;
+      font-size: clamp(1.2rem, 4vw, 2rem);
+      margin-bottom: 20px;
     }
 
     #contador {
       display: flex;
-      gap: 15px;
       justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
     }
 
     .box {
-      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 70px;
     }
 
+    .grupo {
+      display: flex;
+    }
+
+    /* ODÔMETRO RESPONSIVO */
     .odometro {
       overflow: hidden;
-      height: 50px;
-      width: 40px;
+      height: clamp(45px, 10vw, 70px);
+      width: clamp(30px, 8vw, 55px);
       border-radius: 10px;
       background: rgba(255,255,255,0.1);
-      display: inline-block;
       margin: 2px;
     }
 
@@ -52,37 +69,30 @@
     }
 
     .numeros div {
-      height: 50px;
+      height: clamp(45px, 10vw, 70px);
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 2rem;
+      font-size: clamp(1.2rem, 5vw, 2.2rem);
       font-weight: bold;
     }
 
     .label {
-      margin-top: 5px;
-      font-size: 0.9rem;
+      margin-top: 6px;
+      font-size: clamp(0.7rem, 3vw, 1rem);
       color: #cbd5f5;
     }
 
-    .grupo {
-      display: flex;
-    }
-
-    /* Confete */
-    .confete {
-      position: absolute;
-      width: 10px;
-      height: 10px;
-      top: -10px;
-      animation: cair linear infinite;
-    }
-
-    @keyframes cair {
-      to {
-        transform: translateY(100vh) rotate(720deg);
+    /* MOBILE AJUSTE */
+    @media (max-width: 600px) {
+      #contador {
+        gap: 8px;
       }
+    }
+
+    /* FINAL */
+    .final {
+      font-size: 2rem;
     }
   </style>
 </head>
@@ -116,6 +126,8 @@
 </div>
 
 <script>
+document.addEventListener("DOMContentLoaded", () => {
+
 function criarDigito() {
   const container = document.createElement("div");
   container.classList.add("odometro");
@@ -155,7 +167,8 @@ function atualizarDigitos(valor, digitos) {
   const str = valor.toString().padStart(digitos.length, "0");
 
   str.split("").forEach((num, i) => {
-    const offset = num * 50;
+    const altura = digitos[i].parentElement.offsetHeight;
+    const offset = num * altura;
     digitos[i].style.transform = `translateY(-${offset}px)`;
   });
 }
@@ -175,7 +188,7 @@ function atualizar() {
   const diff = dataAlvo - agora;
 
   if (diff <= 0) {
-    document.body.innerHTML = "<h1>🎊 Chegou o grande momento!</h1>";
+    document.body.innerHTML = "<div class='final'>🎊 Chegou o grande momento!</div>";
     return;
   }
 
@@ -193,18 +206,7 @@ function atualizar() {
 setInterval(atualizar, 1000);
 atualizar();
 
-// confete
-function criarConfete() {
-  const c = document.createElement("div");
-  c.classList.add("confete");
-  c.style.left = Math.random() * 100 + "vw";
-  c.style.backgroundColor = `hsl(${Math.random()*360},100%,50%)`;
-  c.style.animationDuration = (Math.random()*3+2)+"s";
-  document.body.appendChild(c);
-  setTimeout(() => c.remove(), 5000);
-}
-
-setInterval(criarConfete, 200);
+});
 </script>
 
 </body>
